@@ -19,6 +19,7 @@ namespace Slingshot.Core.Model
         /// </value>
         public int Id { get; set; }
 
+
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
@@ -42,6 +43,14 @@ namespace Slingshot.Core.Model
         /// The campus identifier.
         /// </value>
         public int? CampusId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the gL Code.
+        /// </summary>
+        /// <value>
+        /// The code.
+        /// </value>
+        public string GlCode { get; set; }
 
         /// <summary>
         /// Gets or sets the parent account identifier.

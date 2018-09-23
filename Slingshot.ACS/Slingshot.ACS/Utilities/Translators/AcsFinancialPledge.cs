@@ -14,7 +14,7 @@ namespace Slingshot.ACS.Utilities.Translators
 
             financialPledge.Id = row.Field<int>( "PledgeId" );
             financialPledge.PersonId = row.Field<int>( "IndividualId" );
-            financialPledge.AccountId = row.Field<Int16>( "FundNumber" );
+            financialPledge.AccountId = AcsApi.ImportSource == ImportSource.CSVFiles ? row.Field<int?>( "FundNumber" ) : row.Field<Int16>( "FundNumber" );
             financialPledge.StartDate = row.Field<DateTime?>( "StartDate" );
             financialPledge.EndDate = row.Field<DateTime?>( "StopDate" );
             financialPledge.TotalAmount = row.Field<decimal>( "TotalPled" );

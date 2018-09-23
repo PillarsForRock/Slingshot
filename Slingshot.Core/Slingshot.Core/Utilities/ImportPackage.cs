@@ -122,6 +122,7 @@ namespace Slingshot.Core.Utilities
                     var newCsvWriter = new CsvWriter( txtWriter );
                     csvWriters.Add( typeName, newCsvWriter );
                     newCsvWriter.WriteHeader<T>();
+                    newCsvWriter.NextRecord();
                     //newCsvWriter.Configuration.QuoteAllFields = true;
 
                     // if model is for person create related writers
@@ -132,18 +133,21 @@ namespace Slingshot.Core.Utilities
                         var newPersonAttributeValueCsvWriter = new CsvWriter( textWriters[ personAttributeValue.GetType().Name ] );
                         csvWriters.Add( personAttributeValue.GetType().Name, newPersonAttributeValueCsvWriter );
                         newPersonAttributeValueCsvWriter.WriteHeader<PersonAttributeValue>();
+                        newPersonAttributeValueCsvWriter.NextRecord();
 
                         // person phones
                         var personPhone = new PersonPhone();
                         var newPersonPhoneCsvWriter = new CsvWriter( textWriters[personPhone.GetType().Name] );
                         csvWriters.Add( personPhone.GetType().Name, newPersonPhoneCsvWriter );
                         newPersonPhoneCsvWriter.WriteHeader<PersonPhone>();
+                        newPersonPhoneCsvWriter.NextRecord();
 
                         // person addresses
                         var personAddress = new PersonAddress();
                         var newPersonAddressCsvWriter = new CsvWriter( textWriters[personAddress.GetType().Name] );
                         csvWriters.Add( personAddress.GetType().Name, newPersonAddressCsvWriter );
                         newPersonAddressCsvWriter.WriteHeader<PersonAddress>();
+                        newPersonAddressCsvWriter.NextRecord();
                     }
 
                     // if model is for financial batch create related writers
@@ -154,13 +158,16 @@ namespace Slingshot.Core.Utilities
                         var newFinancialTransactionCsvWriter = new CsvWriter( textWriters[financialTransaction.GetType().Name] );
                         csvWriters.Add( financialTransaction.GetType().Name, newFinancialTransactionCsvWriter );
                         newFinancialTransactionCsvWriter.WriteHeader<FinancialTransaction>();
+                        newFinancialTransactionCsvWriter.NextRecord();
 
                         // financial transaction detail
                         var financialTransactionDetail = new FinancialTransactionDetail();
                         var newFinancialTransactionDetailCsvWriter = new CsvWriter( textWriters[financialTransactionDetail.GetType().Name] );
                         csvWriters.Add( financialTransactionDetail.GetType().Name, newFinancialTransactionDetailCsvWriter );
                         newFinancialTransactionDetailCsvWriter.WriteHeader<FinancialTransactionDetail>();
+                        newFinancialTransactionDetailCsvWriter.NextRecord();
                     }
+
 
                     // if model is for group create related writers
                     if ( importModel is Group )
@@ -170,12 +177,14 @@ namespace Slingshot.Core.Utilities
                         var newGroupMemberCsvWriter = new CsvWriter( textWriters[groupMember.GetType().Name] );
                         csvWriters.Add( groupMember.GetType().Name, newGroupMemberCsvWriter );
                         newGroupMemberCsvWriter.WriteHeader<GroupMember>();
+                        newGroupMemberCsvWriter.NextRecord();
                     }
                 }
 
                 var csvWriter = csvWriters[typeName];
 
                 csvWriter.WriteRecord<T>( model );
+                csvWriter.NextRecord();
 
                 // if person model write out any related models
                 if ( importModel is Person )
@@ -189,6 +198,7 @@ namespace Slingshot.Core.Utilities
                         foreach ( var attribute in ((Person)importModel).Attributes )
                         {
                             csvPersonAttributeValueWriter.WriteRecord<PersonAttributeValue>( attribute );
+                            csvPersonAttributeValueWriter.NextRecord();
                         }
                     }
 
@@ -201,6 +211,7 @@ namespace Slingshot.Core.Utilities
                         foreach( var phone in ((Person)importModel).PhoneNumbers )
                         {
                             csvPersonPhoneWriter.WriteRecord<PersonPhone>( phone );
+                            csvPersonPhoneWriter.NextRecord();
                         }
                     }
 
@@ -213,6 +224,7 @@ namespace Slingshot.Core.Utilities
                         foreach ( var address in ((Person)importModel).Addresses )
                         {
                             csvPersonAddressWriter.WriteRecord<PersonAddress>( address );
+                            csvPersonAddressWriter.NextRecord();
                         }
                     }
                 }
@@ -232,10 +244,12 @@ namespace Slingshot.Core.Utilities
                         foreach ( var transaction in ((FinancialBatch)importModel).FinancialTransactions )
                         {
                             csvFinancialTransactionWriter.WriteRecord<FinancialTransaction>( transaction );
+                            csvFinancialTransactionWriter.NextRecord();
 
-                            foreach( var transactionDetail in transaction.FinancialTransactionDetails )
+                            foreach ( var transactionDetail in transaction.FinancialTransactionDetails )
                             {
                                 csvFinancialTransactionDetailWriter.WriteRecord<FinancialTransactionDetail>( transactionDetail );
+                                csvFinancialTransactionDetailWriter.NextRecord();
                             }
                         }
                     }
@@ -253,6 +267,7 @@ namespace Slingshot.Core.Utilities
                         foreach ( var groupMemberItem in ( ( Group ) importModel ).GroupMembers )
                         {
                             csvGroupMemberWriter.WriteRecord<GroupMember>( groupMemberItem );
+                            csvGroupMemberWriter.NextRecord();
                         }
                     }
                 }

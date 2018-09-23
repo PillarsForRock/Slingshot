@@ -65,7 +65,7 @@ namespace Slingshot.ACS
             if ( exportSettings.ExportIndividuals )
             {
                 exportWorker.ReportProgress( 1, "Exporting Individuals..." );
-                AcsApi.ExportIndividuals( exportSettings.ModifiedSince, exportSettings.ExportEmailType, exportSettings.ExportCampus );
+                AcsApi.ExportIndividuals( exportSettings.ModifiedSince, exportSettings.ExportEmailType, exportSettings.ExportCampus, exportSettings.PhotoDirectory );
 
                 if ( AcsApi.ErrorMessage.IsNotNullOrWhitespace() )
                 {
@@ -178,6 +178,31 @@ namespace Slingshot.ACS
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
+        private void btnPhotoDirectory_Click( object sender, RoutedEventArgs e )
+        {
+            var dirDialog = new System.Windows.Forms.FolderBrowserDialog();
+            var result = dirDialog.ShowDialog();
+
+            switch ( result )
+            {
+                case System.Windows.Forms.DialogResult.OK:
+                    var dir = dirDialog.SelectedPath;
+                    txtPhotoFolder.Text = dir;
+                    txtPhotoFolder.ToolTip = dir;
+                    break;
+                case System.Windows.Forms.DialogResult.Cancel:
+                default:
+                    txtPhotoFolder.Text = null;
+                    txtPhotoFolder.ToolTip = null;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Handles the Click event of the btnDownloadPackage control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void btnDownloadPackage_Click( object sender, RoutedEventArgs e )
         {
             // launch our background export
@@ -188,7 +213,8 @@ namespace Slingshot.ACS
                 ExportIndividuals = cbIndividuals.IsChecked.Value,
                 ExportGroups = cbGroups.IsChecked.Value,
                 ExportEmailType = ((ComboBoxItem)cblEmailTypes.SelectedItem).Text,
-                ExportCampus = ((ComboBoxItem)cblCampus.SelectedItem).Text
+                ExportCampus = ((ComboBoxItem)cblCampus.SelectedItem).Text,
+                PhotoDirectory = txtPhotoFolder.Text
             };
 
             exportWorker.RunWorkerAsync( exportSettings );
@@ -224,6 +250,8 @@ namespace Slingshot.ACS
         public string ExportEmailType { get; set; }
 
         public string ExportCampus { get; set; }
+
+        public string PhotoDirectory { get; set; }
     }
 
     public class ComboBoxItem

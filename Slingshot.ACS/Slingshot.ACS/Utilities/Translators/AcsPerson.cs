@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,7 +13,7 @@ namespace Slingshot.ACS.Utilities.Translators
 {
     public static class AcsPerson
     {
-        public static Person Translate( DataRow row, string campusKey )
+        public static Person Translate( DataRow row, string campusKey, string photoDirectory )
         {
             var person = new Person();
             var notes = new List<string>();
@@ -149,7 +151,31 @@ namespace Slingshot.ACS.Utilities.Translators
                 default:
                     person.MaritalStatus = MaritalStatus.Unknown;
                     notes.Add( "Marital Status: " + maritalStatus );
+                    if ( maritalStatus.IsNotNullOrWhitespace() )
+                    {
+                        person.Attributes.Add( new PersonAttributeValue
+                        {
+                            AttributeKey = "OtherMaritalStatus",
+                            AttributeValue = maritalStatus,
+                            PersonId = person.Id
+                        } );
+                    }
                     break;
+            }
+
+            // pictures
+            string individualPhoto = row.Field<string>( "IndividualPicture" );
+            if ( individualPhoto.IsNotNullOrWhitespace() )
+            {
+                string fileName = Path.GetFileName( individualPhoto );
+                person.PersonPhotoUrl = Path.Combine( photoDirectory, fileName );
+            }
+
+            string familyPhoto = row.Field<string>( "FamilyPicture" );
+            if ( familyPhoto.IsNotNullOrWhitespace() )
+            {
+                string fileName = Path.GetFileName( familyPhoto );
+                person.FamilyImageUrl = Path.Combine( photoDirectory, fileName );
             }
 
             // connection status
@@ -175,12 +201,12 @@ namespace Slingshot.ACS.Utilities.Translators
             }
 
             // dates
-            person.Birthdate = row.Field<string>( "DateOfBirth" ).AsDateTime();
+            person.Birthdate = AcsApi.ImportSource == ImportSource.CSVFiles ? row.Field<DateTime?>( "DateOfBirth" ) : row.Field<string>( "DateOfBirth" ).AsDateTime();
             person.CreatedDateTime = row.Field<DateTime?>( "EntryDate" );
             person.ModifiedDateTime = row.Field<DateTime?>( "DateLastChanged" );
 
             // family
-            int? familyId = row.Field<string>( "FamilyNumber" ).AsIntegerOrNull();
+            int? familyId = AcsApi.ImportSource == ImportSource.CSVFiles ? row.Field<int?>( "FamilyNumber" ) : row.Field<string>( "FamilyNumber" ).AsIntegerOrNull();
             if ( familyId != null )
             {
                 person.FamilyId = familyId;
@@ -197,9 +223,8 @@ namespace Slingshot.ACS.Utilities.Translators
             switch ( familyRole )
             {
                 case "Head":
-                    person.FamilyRole = FamilyRole.Adult;
-                    break;
                 case "Spouse":
+                case "Adult 2":
                     person.FamilyRole = FamilyRole.Adult;
                     break;
                 case "Child":
@@ -207,7 +232,7 @@ namespace Slingshot.ACS.Utilities.Translators
                     break;
                 default:
                     person.FamilyRole = FamilyRole.Child;
-                    notes.Add( "Family Postion: Other" );
+                    notes.Add( $"Family Postion: {familyRole}" );
                     break;
             }
 
@@ -233,9 +258,7 @@ namespace Slingshot.ACS.Utilities.Translators
                         campus.CampusId = campusId;
                     }
                 }
-            }            
-
-            // person attributes
+            }
 
             // membership date
             var membershipDate = row.Field<DateTime?>( "DateJoined" );
@@ -248,9 +271,25 @@ namespace Slingshot.ACS.Utilities.Translators
                     PersonId = person.Id
                 } );
             }
-            
+
+            // Envelope Number
+            var envelopeNumber = row.Field<int?>( "EnvelopeNumber" );
+            if ( envelopeNumber.HasValue )
+            {
+                person.Attributes.Add( new PersonAttributeValue
+                {
+                    AttributeKey = "core_GivingEnvelopeNumber",
+                    AttributeValue = envelopeNumber.Value.ToString(),
+                    PersonId = person.Id
+                } );
+            }
+
+            // Giving Individually
+            person.GiveIndividually = row.Field<string>( "ContribRecordType" ) != "Combined";
+
             // loop through any attributes found
-            foreach ( var attrib in AcsApi.PersonAttributes )
+            var keysToIgnore = new List<string> { "OtherMaritalStatus" };
+            foreach ( var attrib in AcsApi.PersonAttributes.Where( p => !keysToIgnore.Contains( p.Key ) ) )
             {
                 string value;
 

@@ -55,9 +55,15 @@
                     <TextBox Name="txtImportCutOff" Grid.Row="2"  Margin="0,0,0,10" Padding="3" />
 
                     <Label Content="Export Data Types" Grid.Row="3" FontWeight="Bold" />
-                    <CheckBox Name="cbIndividuals" Grid.Row="4" IsChecked="True" Content="Individuals" Margin="0,10,0,10" Click="cbIndividuals_Checked" />
-                    <CheckBox Name="cbContributions" Grid.Row="4" IsChecked="True" Content="Contributions" Margin="90,10,0,10" />
-                    <CheckBox Name="cbGroups" Grid.Row="4" IsChecked="True" Content="Groups" Margin="195,10,0,10" />
+                    <CheckBox Name="cbIndividuals" Grid.Row="4" IsChecked="True" Content="Individuals" Margin="0,10,0,10" HorizontalAlignment="Left" Width="90" Click="cbIndividuals_Checked" />
+                    <CheckBox Name="cbContributions" Grid.Row="4" IsChecked="True" Content="Contributions" Margin="90,10,0,10" HorizontalAlignment="Left" Width="90"  />
+                    <CheckBox Name="cbGroups" Grid.Row="4" IsChecked="True" Content="Groups" Margin="195,10,0,10" HorizontalAlignment="Left" Width="90"  />
+
+                    <Label Content="Photos Folder" Grid.Row="3" FontWeight="Bold" Margin="300,0,0,0" HorizontalAlignment="Left" Width="240" />
+                    <TextBox Name="txtPhotoFolder" Grid.Row="4" Margin="300,5,0,5" HorizontalAlignment="Left" Width="200" Text="N:\StLukes\Photos" ></TextBox>
+                    <Button Name="btnPhotoDirectory" Grid.Row="4" Margin="510,5,0,5" HorizontalAlignment="Left" Width="50" Click="btnPhotoDirectory_Click" >
+                        <Label Content="Change" FontSize="10" ></Label>
+                    </Button>
 
                     <Label Content="Email Type to Export" Grid.Row="5" Grid.Column="1" FontWeight="Bold" Margin="0,0,0,0"/>
                     <ComboBox ItemsSource="{Binding ExportEmailTypes}" Grid.Row="5" HorizontalAlignment="Left" Margin="0,30,0,10" Name="cblEmailTypes" BorderThickness="0" Width="240">

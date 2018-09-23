@@ -11,8 +11,8 @@ namespace Slingshot.ACS.Utilities.Translators
         {
             var financialTransactionDetail = new FinancialTransactionDetail();
 
-            financialTransactionDetail.AccountId = row.Field<Int16>( "FundNumber" );
-            financialTransactionDetail.Amount = row.Field<decimal>( "Amount" );
+            financialTransactionDetail.AccountId = AcsApi.ImportSource == ImportSource.CSVFiles ? row.Field<int?>( "FundNumber" ) : row.Field<Int16>( "FundNumber" );
+            financialTransactionDetail.Amount = AcsApi.ImportSource == ImportSource.CSVFiles ? ( row.Field<decimal?>( "Amount" ) ?? 0 ) : row.Field<decimal>( "Amount" );
             financialTransactionDetail.TransactionId = row.Field<int>( "TransactionID" );
             financialTransactionDetail.Summary = row.Field<string>( "GiftDescription" );
 

@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Slingshot.ACS"
         mc:Ignorable="d"
-        Title="ACS Database Import" Height="276.41" Width="525" Icon="icon.ico">
-    <Grid>
-        <Grid Margin="20,40,20,20" >
+        Title="ACS Database Import" Height="250" Width="525" Icon="icon.ico">
+        <Grid Margin="20,50,20,40" Grid.ColumnSpan="2" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -17,17 +16,21 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Label Grid.Row="0">Filename</Label>
-            <TextBox Name="txtFilename" Grid.Row="0" Grid.Column="1" Margin="0,2,104,10" Padding="3" Text="" />
-            <Button Content="Browse" Name="btnFileOpen" Grid.Column="1" Margin="321,2,0,0" VerticalAlignment="Top" Height="25" Click="Browse_Click"/>
+            
+            <Label Grid.Row="0" Grid.Column="0" Content="Input Source"/>
+            <RadioButton Name="rbInputMdb" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Margin="5,0,0,0" GroupName="InputSource" Content="Access MDB" IsChecked="False" Checked="rbInputSource_Checked"/>
+            <RadioButton Name="rbInputCsv" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Margin="110,0,0,0" GroupName="InputSource" Content="CSV Files" IsChecked="True" Checked="rbInputSource_Checked"/>
 
-            <Button Name="btnOpen" Grid.Row="3" Grid.Column="1" IsDefault="True" Click="btnOpen_Click" Margin="0,0,0,5"  >
+            <Label Name="lblInput" Grid.Row="1" Grid.Column="0">Filename</Label>
+            <TextBox Name="txtInput" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Width="300" Margin="5, 5,0,5" Padding="3" Text="N:\StLukes\ACSExport" />
+            <Button Name="btnFileOpen" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="80" Margin="310, 0, 0, 0" Content="Browse" Click="Browse_Click" />
+
+        <Button Name="btnOpen" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch"  Margin="5, 10, 10, 0" IsDefault="True" Click="btnOpen_Click" >
                 <Label>Open</Label>
             </Button>
 
-            <TextBlock Name="lblMessage" Grid.Row="4" Grid.Column="1" TextWrapping="WrapWithOverflow"></TextBlock>
+            <TextBlock Name="lblMessage" Grid.Row="3" Grid.Column="1" TextWrapping="WrapWithOverflow"></TextBlock>
+
         </Grid>
-    </Grid>
 </Window>

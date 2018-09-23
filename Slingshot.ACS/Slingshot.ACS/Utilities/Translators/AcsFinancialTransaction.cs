@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Data;
+using System.Security.Cryptography;
+using System.Text;
 
 using Slingshot.Core.Model;
 
@@ -9,11 +11,17 @@ namespace Slingshot.ACS.Utilities.Translators
     {
         public static FinancialTransaction Translate( DataRow row )
         {
+            var giftDate = row.Field<DateTime?>( "GiftDate" );
+            if ( !giftDate.HasValue )
+            {
+                return null;
+            }
+
             var financialTransaction = new FinancialTransaction();
 
             financialTransaction.Id = row.Field<int>( "TransactionID" );
             financialTransaction.TransactionCode = row.Field<string>( "CheckNumber" );
-            financialTransaction.TransactionDate = row.Field<DateTime?>( "GiftDate" );
+            financialTransaction.TransactionDate = giftDate.Value;
             financialTransaction.AuthorizedPersonId = row.Field<int>( "IndividualId" );
 
             // payment types can vary from Church to Church, so using the most popular ones here
@@ -43,11 +51,18 @@ namespace Slingshot.ACS.Utilities.Translators
             // adding the original ACS payment type to the transaction summary for reference
             financialTransaction.Summary = "ACS PaymentType: " + source;
 
-            financialTransaction.BatchId = 9999;
+            string key = giftDate.Value.ToString();
+            MD5 md5Hasher = MD5.Create();
+            var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( key ) );
+            var batchId = Math.Abs( BitConverter.ToInt32( hashed, 0 ) ); // used abs to ensure positive number
+            if ( batchId > 0 )
+            {
+                financialTransaction.BatchId = batchId;
+            }
 
             financialTransaction.TransactionType = TransactionType.Contribution;
 
-            financialTransaction.CreatedDateTime = row.Field<DateTime?>( "GiftDate" );
+            financialTransaction.CreatedDateTime = giftDate;
 
             return financialTransaction;
         }

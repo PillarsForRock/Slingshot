@@ -16,7 +16,7 @@ namespace Slingshot.ACS.Utilities.Translators
         {
             var note = new FamilyNote();
 
-            int? familyId = row.Field<string>( "FamilyNumber" ).AsIntegerOrNull();
+            int? familyId = AcsApi.ImportSource == ImportSource.CSVFiles ? row.Field<int?>( "FamilyNumber" ) : row.Field<string>( "FamilyNumber" ).AsIntegerOrNull();
             if ( familyId != null )
             {
                 note.FamilyId = familyId.Value;
