@@ -70,12 +70,10 @@
     <Compile Include="Utilities\ElexioApi.cs" />
     <Compile Include="Utilities\Translators\ElexioAttendance.cs" />
     <Compile Include="Utilities\Translators\ElexioFinancialAccount.cs" />
-    <Compile Include="Utilities\Translators\ElexioFinancialTransactionDetail.cs" />
     <Compile Include="Utilities\Translators\ElexioGroup.cs" />
     <Compile Include="Utilities\Translators\ElexioGroupMember.cs" />
     <Compile Include="Utilities\Translators\ElexioPerson.cs" />
     <Compile Include="Utilities\Translators\ElexioFinancialPledge.cs" />
-    <Compile Include="Utilities\Translators\ElexioFinancialTransaction.cs" />
     <Page Include="Login.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

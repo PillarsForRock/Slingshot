@@ -146,7 +146,7 @@ namespace Slingshot.Elexio.Utilities
             ImportPackage.InitalizePackageFolder();
             _uids = new List<int>();
             _accountLookups = new Dictionary<int, string>();
-    }
+        }
 
         /// <summary>
         /// Connects the specified host name.
@@ -179,7 +179,7 @@ namespace Slingshot.Elexio.Utilities
             // execute the request to get a oauth token and secret
             var response = _client.Execute( _request );
             LoginResponse responseObject = JsonConvert.DeserializeObject<LoginResponse>( response.Content );
-            
+
             if ( response.StatusCode == System.Net.HttpStatusCode.OK && responseObject != null )
             {
                 IsConnected = true;
@@ -345,20 +345,68 @@ namespace Slingshot.Elexio.Utilities
                     {
                         csv.Configuration.RegisterClassMap<GivingCSVMap>();
 
-                        var records = csv.GetRecords<GivingCSV>();
-                        foreach ( var transaction in records.ToList() )
-                        {
-                            FinancialTransaction importTransaction = ElexioFinancialTransaction.Translate( transaction );
-                            if ( importTransaction != null )
+                        var records = csv.GetRecords<GivingCSV>().ToList();
+
+                        // create a batch for each day
+                        var batches = records.GroupBy( g => g.Date.Date,
+                            ( key, g ) => new FinancialBatch
                             {
-                                ImportPackage.WriteToPackage( importTransaction );
+                                Id = ( key.ToString( "MMddyyyy" ) ).AsInteger(),
+                                Name = key.ToShortDateString(),
+                                StartDate = key.Date,
+                                EndDate = key.Date,
+                                Status = BatchStatus.Closed,
+                            } ).ToList();
+
+                        foreach ( FinancialBatch batch in batches )
+                        {
+                            var transactions = records.Where( r => r.Date == batch.StartDate.Value )
+                              .Select( s => new FinancialTransaction
+                              {
+                                  Id = s.Id,
+                                  BatchId = batch.Id,
+                                  AuthorizedPersonId = s.UserId,
+                                  TransactionCode = s.CheckNumber,
+                                  TransactionDate = s.Date,
+                                  Summary = s.Note,
+                                  TransactionSource = TransactionSource.OnsiteCollection,
+                                  TransactionType = TransactionType.Contribution
+                              } ).ToList();
+
+                            foreach ( FinancialTransaction transaction in transactions )
+                            {
+                                // check to see if the account already exists.  If not, it is likely the giving category is inactive and can't be exported via the API.
+                                var transactionRecord = records.Where( r => r.Id == transaction.Id ).FirstOrDefault();
+                                int accountId = _accountLookups.Where( a => a.Value == transactionRecord.Category ).Select( a => a.Key ).FirstOrDefault();
+                                if ( accountId < 1 )
+                                {
+                                    MD5 md5Hasher = MD5.Create();
+                                    var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( transactionRecord.Category ) );
+                                    accountId = Math.Abs( BitConverter.ToInt32( hashed, 0 ) ); // used abs to ensure positive number
+
+                                    // export this new financial account and then update the lookups
+                                    ImportPackage.WriteToPackage( new FinancialAccount()
+                                    {
+                                        Id = accountId,
+                                        Name = transactionRecord.Category,
+                                        IsTaxDeductible = true
+                                    } );
+
+                                    _accountLookups.Add( accountId, transactionRecord.Category );
+                                }
+
+                                transaction.FinancialTransactionDetails.Add( new FinancialTransactionDetail
+                                {
+                                    Id = transaction.Id,
+                                    TransactionId = transaction.Id,
+                                    Amount = records.Where( r => r.Id == transaction.Id ).Select( r => r.Amount ).FirstOrDefault(),
+                                    AccountId = accountId
+                                } );
                             }
 
-                            FinancialTransactionDetail importTransactionDetail = ElexioFinancialTransactionDetail.Translate( transaction, _accountLookups );
-                            if ( importTransaction != null )
-                            {
-                                ImportPackage.WriteToPackage( importTransactionDetail );
-                            }
+                            batch.FinancialTransactions.AddRange( transactions );
+
+                            ImportPackage.WriteToPackage( batch );
                         }
                     }
                 }
@@ -481,7 +529,7 @@ namespace Slingshot.Elexio.Utilities
         public static void WritePersonAttributes()
         {
             MetaData = GetMetaData();
-            
+
             //// dates 1 - 10
             // date 1
             if ( MetaData.data.dateFieldLabels.date1 != null )
@@ -804,12 +852,12 @@ namespace Slingshot.Elexio.Utilities
         public string StatusCode { get; set; }
 
         [JsonProperty( "data" )]
-        public Data Data { get; set; } 
+        public Data Data { get; set; }
     }
 
     public class Data
     {
-        [JsonProperty("fname")]
+        [JsonProperty( "fname" )]
         public string FirstName { get; set; }
 
         [JsonProperty( "lname" )]
@@ -867,7 +915,7 @@ namespace Slingshot.Elexio.Utilities
                 public string text14 { get; set; }
                 public string text15 { get; set; }
             }
-        }        
+        }
     }
 
     public class GivingCSV
@@ -905,7 +953,7 @@ namespace Slingshot.Elexio.Utilities
             Map( m => m.CheckNumber ).Name( "Check Number" );
             Map( m => m.Amount ).ConvertUsing( m =>
                  {
-                     return decimal.Parse( Regex.Replace( m.GetField("Amount") , @"[^\d.]", "" ) );
+                     return decimal.Parse( Regex.Replace( m.GetField( "Amount" ), @"[^\d.]", "" ) );
                  } );
         }
     }

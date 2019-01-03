@@ -106,17 +106,8 @@ namespace Slingshot.Elexio
                 ElexioApi.ExportFinancialTransactions( exportSettings.GivingCSVFileName );
                 if ( ElexioApi.ErrorMessage.IsNotNullOrWhitespace() )
                 {
-                    exportWorker.ReportProgress( 38, $"Error exporting financial transactions: {ElexioApi.ErrorMessage}" );
+                    exportWorker.ReportProgress( 38, $"Error exporting financial data: {ElexioApi.ErrorMessage}" );
                 }
-
-                exportWorker.ReportProgress( 40, "Exporting Financial Batches..." );
-
-                if ( ElexioApi.ErrorMessage.IsNotNullOrWhitespace() )
-                {
-                    exportWorker.ReportProgress( 43, $"Error exporting financial batches: {ElexioApi.ErrorMessage}" );
-                }
-
-
             }
 
             // export groups
