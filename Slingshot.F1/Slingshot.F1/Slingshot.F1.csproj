@@ -34,12 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OrcaMDF.Core">
-      <HintPath>..\libs\OrcaMDF.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="OrcaMDF.Framework">
-      <HintPath>..\libs\OrcaMDF.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
     </Reference>
@@ -66,9 +60,7 @@
     <Compile Include="Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Utilities\F1Mdf.cs" />
     <Compile Include="Utilities\F1Api.cs" />
-    <Compile Include="Utilities\F1Translator.cs" />
     <Compile Include="Utilities\Translators\F1FinancialBatch.cs" />
     <Compile Include="Utilities\Translators\F1FinancialAccount.cs" />
     <Compile Include="Utilities\Translators\F1FinancialPledge.cs" />
@@ -130,10 +122,7 @@
       <Name>Slingshot.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utilities\Translators\API\" />
-    <Folder Include="Utilities\Translators\MDF\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Resource Include="Assets\Icon\icon-128.png" />
     <Resource Include="Assets\Icon\icon-192.png" />

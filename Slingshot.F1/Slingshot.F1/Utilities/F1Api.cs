@@ -22,10 +22,30 @@ namespace Slingshot.F1.Utilities
     /// <summary>
     /// API F1 Status
     /// </summary>
-    public class F1Api : F1Translator
+    public static class F1Api
     {
         private static RestClient _client;
         private static RestRequest _request;
+        private static int loopThreshold = 100000000;
+        private static List<int> AccountIds;
+        private static List<FamilyMember> familyMembers = new List<FamilyMember>();
+
+        /// <summary>
+        ///  Set F1Api.DumpResponseToXmlFile to true to save all API Responses
+        ///   to XML files and include them in the slingshot package
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if the response should get dumped to XML; otherwise, <c>false</c>.
+        /// </value>
+        public static bool DumpResponseToXmlFile { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last run date.
+        /// </summary>
+        /// <value>
+        /// The last run date.
+        /// </value>
+        public static DateTime LastRunDate { get; set; } = DateTime.MinValue;
 
         /// <summary>
         /// Gets or sets the api counter.
@@ -42,6 +62,14 @@ namespace Slingshot.F1.Utilities
         /// The domain.
         /// </value>
         public static string Hostname { get; set; }
+
+        /// <summary>
+        /// Gets or sets the error message.
+        /// </summary>
+        /// <value>
+        /// The error message.
+        /// </value>
+        public static string ErrorMessage { get; set; }
 
         /// <summary>
         /// Gets the API URL.
@@ -105,6 +133,14 @@ namespace Slingshot.F1.Utilities
         /// </value>
         public static string OAuthSecret { get; set; }
 
+        /// <summary>
+        /// Gets a value indicating whether this instance is connected.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is connected; otherwise, <c>false</c>.
+        /// </value>
+        public static bool IsConnected { get; private set; } = false;
+
         #region API Call Paths
 
         private const string API_ACCESS_TOKEN = "/v1/PortalUser/AccessToken";
@@ -122,6 +158,14 @@ namespace Slingshot.F1.Utilities
         private const string API_GROUP_MEMBERS = "/groups/v1/groups/";
 
         #endregion
+
+        /// <summary>
+        /// Initializes the export.
+        /// </summary>
+        public static void InitializeExport()
+        {
+            ImportPackage.InitalizePackageFolder();
+        }
 
         /// <summary>
         /// Connects the specified host name.
@@ -179,7 +223,7 @@ namespace Slingshot.F1.Utilities
         /// </summary>
         /// <param name="modifiedSince">The modified since.</param>
         /// <param name="peoplePerPage">The people per page.</param>
-        public override void ExportIndividuals( DateTime modifiedSince, int peoplePerPage = 500 )
+        public static void ExportIndividuals( DateTime modifiedSince, int peoplePerPage = 500 )
         {
             TextInfo textInfo = new CultureInfo( "en-US", false ).TextInfo;
 
@@ -296,7 +340,7 @@ namespace Slingshot.F1.Utilities
         /// <summary>
         /// Exports the accounts.
         /// </summary>
-        public override void ExportFinancialAccounts()
+        public static void ExportFinancialAccounts()
         {
             try
             {
@@ -370,7 +414,7 @@ namespace Slingshot.F1.Utilities
         /// <summary>
         /// Exports the pledges.
         /// </summary>
-        public override void ExportFinancialPledges()
+        public static void ExportFinancialPledges()
         {
             int loopCounter = 0;
             try
@@ -415,7 +459,7 @@ namespace Slingshot.F1.Utilities
         /// Exports the batches.
         /// </summary>
         /// <param name="modifiedSince">The modified since.</param>
-        public override void ExportFinancialBatches( DateTime modifiedSince )
+        public static void ExportFinancialBatches( DateTime modifiedSince )
         {
             try
             {
@@ -509,7 +553,7 @@ namespace Slingshot.F1.Utilities
         /// Exports the contributions.
         /// </summary>
         /// <param name="modifiedSince">The modified since.</param>
-        public override void ExportContributions( DateTime modifiedSince, bool exportContribImages )
+        public static void ExportContributions( DateTime modifiedSince, bool exportContribImages )
         {
             HashSet<int> transactionIds = new HashSet<int>();
 
@@ -652,7 +696,7 @@ namespace Slingshot.F1.Utilities
         /// <param name="selectedGroupTypes">The selected group types.</param>
         /// <param name="modifiedSince">The modified since.</param>
         /// <param name="perPage">The people per page.</param>
-        public override void ExportGroups( List<int> selectedGroupTypes )
+        public static void ExportGroups( List<int> selectedGroupTypes )
         {
             // write out the group types
             WriteGroupTypes( selectedGroupTypes );
@@ -734,7 +778,7 @@ namespace Slingshot.F1.Utilities
         /// <summary>
         /// Exports the person attributes.
         /// </summary>
-        public override List<PersonAttribute> WritePersonAttributes()
+        public static List<PersonAttribute> WritePersonAttributes()
         {
             // export person fields as attributes
             ImportPackage.WriteToPackage( new PersonAttribute()
@@ -870,7 +914,7 @@ namespace Slingshot.F1.Utilities
                             // comment attribute
                             var personAttributeComment = new PersonAttribute()
                             {
-                                Name = attributeName + " Comment",
+                                Name = attributeName+ " Comment",
                                 Key = attributeId + "_" + attributeName.RemoveSpaces().RemoveSpecialCharacters() + "Comment",
                                 Category = attributeGroup,
                                 FieldType = "Rock.Field.Types.TextFieldType"
@@ -920,7 +964,7 @@ namespace Slingshot.F1.Utilities
         /// Gets the group types.
         /// </summary>
         /// <returns></returns>
-        public override List<GroupType> GetGroupTypes()
+        public static List<GroupType> GetGroupTypes()
         {
             List<GroupType> groupTypes = new List<GroupType>();
 
@@ -964,7 +1008,7 @@ namespace Slingshot.F1.Utilities
         /// Writes the group types.
         /// </summary>
         /// <param name="selectedGroupTypes">The selected group types.</param>
-        public override void WriteGroupTypes( List<int> selectedGroupTypes )
+        public static void WriteGroupTypes( List<int> selectedGroupTypes )
         {
             // add custom defined group types
             var groupTypes = GetGroupTypes();
@@ -978,11 +1022,7 @@ namespace Slingshot.F1.Utilities
             }
         }
 
-        /// <summary>
-        /// Gets the family members.
-        /// </summary>
-        /// <returns></returns>
-        public override List<FamilyMember> GetFamilyMembers()
+        public static List<FamilyMember> GetFamilyMembers()
         {
             var headOfHouseholds = new List<FamilyMember>();
             HashSet<int> personIds = new HashSet<int>();
@@ -1087,5 +1127,23 @@ namespace Slingshot.F1.Utilities
 
             return familyMembers;
         }
+    }
+
+    /// <summary>
+    /// The Family Member.
+    ///
+    /// Used to determine head of household and household campus.
+    /// </summary>
+    public class FamilyMember
+    {
+        public int HouseholdId { get; set; }
+
+        public int PersonId { get; set; }
+
+        public int FamilyRoleId { get; set; }
+
+        public string HouseholdCampusName { get; set; }
+
+        public int? HouseholdCampusId { get; set; }
     }
 }
