@@ -376,15 +376,15 @@ namespace Slingshot.Elexio.Utilities
                             foreach ( FinancialTransaction transaction in transactions )
                             {
                                 // check to see if the account already exists.  If not, it is likely the giving category is inactive and can't be exported via the API.
-                                var transactionRecord = records.Where( r => r.Id == transaction.Id ).FirstOrDefault();
-                                int accountId = _accountLookups.Where( a => a.Value == transactionRecord.Category ).Select( a => a.Key ).FirstOrDefault();
+                                var transactionRecord = records.Where( r => r.Id == transaction.Id ).SingleOrDefault();
+                                int accountId = _accountLookups.Where( a => a.Value == transactionRecord.Category ).Select( a => a.Key ).SingleOrDefault();
                                 if ( accountId < 1 )
                                 {
                                     MD5 md5Hasher = MD5.Create();
                                     var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( transactionRecord.Category ) );
                                     accountId = Math.Abs( BitConverter.ToInt32( hashed, 0 ) ); // used abs to ensure positive number
 
-                                    // export this new financial account and then update the lookups
+                                    // export this new financial account and then update the lookup
                                     ImportPackage.WriteToPackage( new FinancialAccount()
                                     {
                                         Id = accountId,
@@ -399,7 +399,7 @@ namespace Slingshot.Elexio.Utilities
                                 {
                                     Id = transaction.Id,
                                     TransactionId = transaction.Id,
-                                    Amount = records.Where( r => r.Id == transaction.Id ).Select( r => r.Amount ).FirstOrDefault(),
+                                    Amount = records.Where( r => r.Id == transaction.Id ).Select( r => r.Amount ).SingleOrDefault(),
                                     AccountId = accountId
                                 } );
                             }
@@ -837,6 +837,15 @@ namespace Slingshot.Elexio.Utilities
             {
                 Name = "Death Date",
                 Key = "DeathDate",
+                Category = "Elexio Attributes",
+                FieldType = "Rock.Field.Types.DateFieldType"
+            } );
+
+            // last attended
+            ImportPackage.WriteToPackage( new PersonAttribute()
+            {
+                Name = "Last Attended",
+                Key = "LastAttended",
                 Category = "Elexio Attributes",
                 FieldType = "Rock.Field.Types.DateFieldType"
             } );

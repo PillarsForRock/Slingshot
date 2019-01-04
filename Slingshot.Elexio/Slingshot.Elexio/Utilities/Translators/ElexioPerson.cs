@@ -28,15 +28,15 @@ namespace Slingshot.Elexio.Utilities.Translators
             string secondEmail = importPerson.secondaryEmail;
             if ( secondEmail.IsNotNullOrWhitespace() )
             {
-                PersonNote note = new PersonNote();
-                note.PersonId = person.Id;
-                note.NoteType = "Secondary Email";
-                note.Text = secondEmail;
+                PersonNote emailNote = new PersonNote();
+                emailNote.PersonId = person.Id;
+                emailNote.NoteType = "Secondary Email";
+                emailNote.Text = secondEmail;
 
                 // offset the Id by 1 million so that these notes do not overlap.
-                note.Id = 1000000 + person.Id;
+                emailNote.Id = 1000000 + person.Id;
 
-                ImportPackage.WriteToPackage( note );
+                ImportPackage.WriteToPackage( emailNote );
             }
 
             // gender
@@ -191,7 +191,7 @@ namespace Slingshot.Elexio.Utilities.Translators
             }
 
             // date of birth
-            string birthdate = importPerson.updated;
+            string birthdate = importPerson.dateBirth;
             if ( birthdate.AsDateTime().HasValue )
             {
                 person.Birthdate = birthdate.AsDateTime().Value;
@@ -220,6 +220,18 @@ namespace Slingshot.Elexio.Utilities.Translators
                     PersonId = person.Id,
                     AttributeKey = "DeathDate",
                     AttributeValue = dateDied.AsDateTime().Value.ToString( "o" )
+                } );
+            }
+
+            // last attended
+            string lastAttended = importPerson.timeLastAttended;
+            if ( lastAttended.AsDouble() > 0 )
+            {
+                person.Attributes.Add( new PersonAttributeValue()
+                {
+                    PersonId = person.Id,
+                    AttributeKey = "LastAttended",
+                    AttributeValue = UnixTimeStampToDateTime( lastAttended.AsDouble() ).ToString( "o" )
                 } );
             }
 
@@ -529,8 +541,6 @@ namespace Slingshot.Elexio.Utilities.Translators
                     AttributeValue = importPerson.text15
                 } );
             }
-
-
 
             #endregion
 
