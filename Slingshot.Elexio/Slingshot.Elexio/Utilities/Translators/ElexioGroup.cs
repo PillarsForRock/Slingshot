@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Slingshot.Core;
 using Slingshot.Core.Model;
+using Group = Slingshot.Core.Model.Group;
 
 namespace Slingshot.Elexio.Utilities.Translators
 {
@@ -17,7 +19,9 @@ namespace Slingshot.Elexio.Utilities.Translators
             group.Id = importGroup.gid;
             group.GroupTypeId = 9999;
             group.Name = importGroup.name;
-            group.Description = importGroup.description;
+
+            string desc = importGroup.description;
+            group.Description = Regex.Replace( desc, @"<.*?>", string.Empty );
 
             string active = importGroup.active;
             group.IsActive = active.AsBoolean();
