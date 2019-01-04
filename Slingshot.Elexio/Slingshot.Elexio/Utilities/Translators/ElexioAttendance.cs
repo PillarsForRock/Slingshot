@@ -18,6 +18,11 @@ namespace Slingshot.Elexio.Utilities.Translators
             attendance.GroupId = importAttendance.gid;
             attendance.Note = importAttendance.reason;
 
+            if ( importAttendance.present == 0 )
+            {
+                attendance.Note = "Did not attend.";
+            }
+
             return attendance;
         }
     }
