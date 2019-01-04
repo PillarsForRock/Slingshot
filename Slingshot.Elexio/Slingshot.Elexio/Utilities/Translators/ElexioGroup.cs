@@ -22,6 +22,27 @@ namespace Slingshot.Elexio.Utilities.Translators
             string active = importGroup.active;
             group.IsActive = active.AsBoolean();
 
+            // address
+            string street1 = importGroup.address;
+            string city = importGroup.city;
+            string state = importGroup.state;
+            string postalcode = importGroup.zipcode;
+
+            if ( street1.IsNotNullOrWhitespace() && city.IsNotNullOrWhitespace() &&
+                 state.IsNotNullOrWhitespace() && postalcode.IsNotNullOrWhitespace() )
+            {
+                var address = new GroupAddress();
+                address.GroupId = group.Id;
+                address.Street1 = street1;
+                address.City = city;
+                address.State = state;
+                address.PostalCode = postalcode;
+                address.AddressType = AddressType.Home;
+
+                group.Addresses.Add( address );
+            }
+
+            // meeting day and time
             group.MeetingDay = importGroup.meetingDay;
             group.MeetingTime = importGroup.meetingTime;
 
