@@ -49,6 +49,12 @@ namespace Slingshot.Elexio.Utilities.Translators
                 person.Gender = Gender.Female;
             }
 
+            // marital status is not a built in field
+            person.MaritalStatus = MaritalStatus.Unknown;
+
+            // connection status is not a built in field
+            person.ConnectionStatus = "Unknown";
+
             // family
             var _client = new RestClient( ElexioApi.ApiUrl );
             var _request = new RestRequest( ElexioApi.API_INDIVIDUAL + person.Id.ToString(), Method.GET );
