@@ -207,7 +207,7 @@ namespace Slingshot.Elexio.Utilities
         /// <summary>
         /// Exports the individuals.
         /// </summary>
-        public static void ExportIndividuals()
+        public static void ExportIndividuals( string filename )
         {
             WritePersonAttributes();
 
@@ -235,6 +235,46 @@ namespace Slingshot.Elexio.Utilities
                             {
                                 ImportPackage.WriteToPackage( importPerson );
                             }
+                        }
+                    }
+                }
+            }
+            catch ( Exception ex )
+            {
+                ErrorMessage = ex.Message;
+            }
+
+            // export person notes via the CSV since notes are unavailable in the API despite
+            //  what the documentation says.
+            try
+            {
+                if ( filename.IsNotNullOrWhitespace() )
+                {
+                    using ( TextReader reader = File.OpenText( filename ) )
+                    {                      
+                        using ( var csv = new CsvReader( reader ) )
+                        {
+                            csv.Configuration.RegisterClassMap<IndividualCSVMap>();
+                            var records = csv.GetRecords<IndividualCSV>().ToList();
+
+                            int counter = 1;
+                            foreach ( var record in records )
+                            {
+                                if ( record.Notes.IsNotNullOrWhitespace() )
+                                {
+                                    ImportPackage.WriteToPackage( new PersonNote()
+                                    {
+                                        Id = counter,
+                                        PersonId = record.UserId,
+                                        NoteType = "General Note",
+                                        Text = record.Notes
+                                    } );
+
+                                    counter++;
+                                }
+                            }
+
+
                         }
                     }
                 }
@@ -339,76 +379,79 @@ namespace Slingshot.Elexio.Utilities
         {
             try
             {
-                using ( TextReader reader = File.OpenText( filename ) )
+                if ( filename.IsNotNullOrWhitespace() )
                 {
-                    using ( var csv = new CsvReader( reader ) )
+                    using ( TextReader reader = File.OpenText( filename ) )
                     {
-                        csv.Configuration.RegisterClassMap<GivingCSVMap>();
-
-                        var records = csv.GetRecords<GivingCSV>().ToList();
-
-                        // create a batch for each day
-                        var batches = records.GroupBy( g => g.Date.Date,
-                            ( key, g ) => new FinancialBatch
-                            {
-                                Id = ( key.ToString( "MMddyyyy" ) ).AsInteger(),
-                                Name = key.ToShortDateString(),
-                                StartDate = key.Date,
-                                EndDate = key.Date,
-                                Status = BatchStatus.Closed,
-                            } ).ToList();
-
-                        foreach ( FinancialBatch batch in batches )
+                        using ( var csv = new CsvReader( reader ) )
                         {
-                            var transactions = records.Where( r => r.Date == batch.StartDate.Value )
-                              .Select( s => new FinancialTransaction
-                              {
-                                  Id = s.Id,
-                                  BatchId = batch.Id,
-                                  AuthorizedPersonId = s.UserId,
-                                  TransactionCode = s.CheckNumber,
-                                  TransactionDate = s.Date,
-                                  Summary = s.Note,
-                                  TransactionSource = TransactionSource.OnsiteCollection,
-                                  TransactionType = TransactionType.Contribution
-                              } ).ToList();
+                            csv.Configuration.RegisterClassMap<GivingCSVMap>();
 
-                            foreach ( FinancialTransaction transaction in transactions )
-                            {
-                                // check to see if the account already exists.  If not, it is likely the giving category is inactive and can't be exported via the API.
-                                var transactionRecord = records.Where( r => r.Id == transaction.Id ).SingleOrDefault();
-                                int accountId = _accountLookups.Where( a => a.Value == transactionRecord.Category ).Select( a => a.Key ).SingleOrDefault();
-                                if ( accountId < 1 )
+                            var records = csv.GetRecords<GivingCSV>().ToList();
+
+                            // create a batch for each day
+                            var batches = records.GroupBy( g => g.Date.Date,
+                                ( key, g ) => new FinancialBatch
                                 {
-                                    MD5 md5Hasher = MD5.Create();
-                                    var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( transactionRecord.Category ) );
-                                    accountId = Math.Abs( BitConverter.ToInt32( hashed, 0 ) ); // used abs to ensure positive number
+                                    Id = ( key.ToString( "MMddyyyy" ) ).AsInteger(),
+                                    Name = key.ToShortDateString(),
+                                    StartDate = key.Date,
+                                    EndDate = key.Date,
+                                    Status = BatchStatus.Closed,
+                                } ).ToList();
 
-                                    // export this new financial account and then update the lookup
-                                    ImportPackage.WriteToPackage( new FinancialAccount()
+                            foreach ( FinancialBatch batch in batches )
+                            {
+                                var transactions = records.Where( r => r.Date == batch.StartDate.Value )
+                                  .Select( s => new FinancialTransaction
+                                  {
+                                      Id = s.Id,
+                                      BatchId = batch.Id,
+                                      AuthorizedPersonId = s.UserId,
+                                      TransactionCode = s.CheckNumber,
+                                      TransactionDate = s.Date,
+                                      Summary = s.Note,
+                                      TransactionSource = TransactionSource.OnsiteCollection,
+                                      TransactionType = TransactionType.Contribution
+                                  } ).ToList();
+
+                                foreach ( FinancialTransaction transaction in transactions )
+                                {
+                                    // check to see if the account already exists.  If not, it is likely the giving category is inactive and can't be exported via the API.
+                                    var transactionRecord = records.Where( r => r.Id == transaction.Id ).SingleOrDefault();
+                                    int accountId = _accountLookups.Where( a => a.Value == transactionRecord.Category ).Select( a => a.Key ).SingleOrDefault();
+                                    if ( accountId < 1 )
                                     {
-                                        Id = accountId,
-                                        Name = transactionRecord.Category,
-                                        IsTaxDeductible = true
-                                    } );
+                                        MD5 md5Hasher = MD5.Create();
+                                        var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( transactionRecord.Category ) );
+                                        accountId = Math.Abs( BitConverter.ToInt32( hashed, 0 ) ); // used abs to ensure positive number
 
-                                    _accountLookups.Add( accountId, transactionRecord.Category );
+                                        // export this new financial account and then update the lookup
+                                        ImportPackage.WriteToPackage( new FinancialAccount()
+                                        {
+                                            Id = accountId,
+                                            Name = transactionRecord.Category,
+                                            IsTaxDeductible = true
+                                        } );
+
+                                        _accountLookups.Add( accountId, transactionRecord.Category );
+                                    }
+
+                                    transaction.FinancialTransactionDetails.Add( new FinancialTransactionDetail
+                                    {
+                                        Id = transaction.Id,
+                                        TransactionId = transaction.Id,
+                                        Amount = records.Where( r => r.Id == transaction.Id ).Select( r => r.Amount ).SingleOrDefault(),
+                                        AccountId = accountId
+                                    } );
                                 }
 
-                                transaction.FinancialTransactionDetails.Add( new FinancialTransactionDetail
-                                {
-                                    Id = transaction.Id,
-                                    TransactionId = transaction.Id,
-                                    Amount = records.Where( r => r.Id == transaction.Id ).Select( r => r.Amount ).SingleOrDefault(),
-                                    AccountId = accountId
-                                } );
+                                batch.FinancialTransactions.AddRange( transactions );
+
+                                ImportPackage.WriteToPackage( batch );
                             }
-
-                            batch.FinancialTransactions.AddRange( transactions );
-
-                            ImportPackage.WriteToPackage( batch );
                         }
-                    }
+                    } 
                 }
             }
             catch ( Exception ex )
@@ -927,6 +970,23 @@ namespace Slingshot.Elexio.Utilities
         }
     }
 
+    public class IndividualCSV
+    {
+        public int UserId { get; set; }
+
+        public string Notes { get; set; }
+    }
+
+    public sealed class IndividualCSVMap : CsvClassMap<IndividualCSV>
+    {
+        public IndividualCSVMap()
+        {
+            AutoMap();
+            Map( m => m.UserId ).Name( "User ID" );
+            Map( m => m.Notes ).Name( "notes" );
+        }
+    }
+
     public class GivingCSV
     {
         public int Id { get; set; }
@@ -966,5 +1026,4 @@ namespace Slingshot.Elexio.Utilities
                  } );
         }
     }
-
 }

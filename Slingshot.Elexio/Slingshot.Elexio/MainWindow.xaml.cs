@@ -71,7 +71,7 @@ namespace Slingshot.Elexio
             if ( exportSettings.ExportIndividuals )
             {
                 exportWorker.ReportProgress( 1, "Exporting Individuals..." );
-                ElexioApi.ExportIndividuals();
+                ElexioApi.ExportIndividuals( exportSettings.PersonCSVFileName );
 
                 if ( ElexioApi.ErrorMessage.IsNotNullOrWhitespace() )
                 {
@@ -176,8 +176,9 @@ namespace Slingshot.Elexio
             var exportSettings = new ExportSettings
             {
                 ExportIndividuals = cbIndividuals.IsChecked.Value,
+                PersonCSVFileName = txtPersonFilename.Text,
                 ExportContributions = cbContributions.IsChecked.Value,
-                GivingCSVFileName = txtFilename.Text,
+                GivingCSVFileName = txtGivingFilename.Text,
                 ExportGroups = cbGroups.IsChecked.Value,
                 ExportAttendance = cbAttendance.IsChecked.Value
             };
@@ -187,7 +188,7 @@ namespace Slingshot.Elexio
 
         #region Window Events
 
-        private void Browse_Click( object sender, RoutedEventArgs e )
+        private void PersonBrowse_Click( object sender, RoutedEventArgs e )
         {
             var fileDialog = new System.Windows.Forms.OpenFileDialog();
             var result = fileDialog.ShowDialog();
@@ -196,13 +197,33 @@ namespace Slingshot.Elexio
             {
                 case System.Windows.Forms.DialogResult.OK:
                     var file = fileDialog.FileName;
-                    txtFilename.Text = file;
-                    txtFilename.ToolTip = file;
+                    txtPersonFilename.Text = file;
+                    txtPersonFilename.ToolTip = file;
                     break;
                 case System.Windows.Forms.DialogResult.Cancel:
                 default:
-                    txtFilename.Text = null;
-                    txtFilename.ToolTip = null;
+                    txtPersonFilename.Text = null;
+                    txtPersonFilename.ToolTip = null;
+                    break;
+            }
+        }
+
+        private void GivingBrowse_Click( object sender, RoutedEventArgs e )
+        {
+            var fileDialog = new System.Windows.Forms.OpenFileDialog();
+            var result = fileDialog.ShowDialog();
+
+            switch ( result )
+            {
+                case System.Windows.Forms.DialogResult.OK:
+                    var file = fileDialog.FileName;
+                    txtGivingFilename.Text = file;
+                    txtGivingFilename.ToolTip = file;
+                    break;
+                case System.Windows.Forms.DialogResult.Cancel:
+                default:
+                    txtGivingFilename.Text = null;
+                    txtGivingFilename.ToolTip = null;
                     break;
             }
         }
@@ -213,6 +234,8 @@ namespace Slingshot.Elexio
     public class ExportSettings
     {
         public bool ExportIndividuals { get; set; } = true;
+
+        public string PersonCSVFileName { get; set; } = "";
 
         public bool ExportContributions { get; set; } = true;
 
