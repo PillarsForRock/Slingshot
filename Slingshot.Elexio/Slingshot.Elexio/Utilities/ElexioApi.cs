@@ -25,7 +25,7 @@ using Slingshot.Elexio.Utilities.Translators;
 namespace Slingshot.Elexio.Utilities
 {
     /// <summary>
-    /// API F1 Status
+    /// Elexio API
     /// </summary>
     public static class ElexioApi
     {
@@ -34,16 +34,13 @@ namespace Slingshot.Elexio.Utilities
         private static List<int> _uids = new List<int>();
         private static Dictionary<int, string> _accountLookups = new Dictionary<int, string>();
 
-        public static MetaData MetaData { get; set; }
-
         /// <summary>
-        ///  Set F1Api.DumpResponseToXmlFile to true to save all API Responses
-        ///   to XML files and include them in the slingshot package
+        /// Gets or sets the meta data.
         /// </summary>
         /// <value>
-        /// <c>true</c> if the response should get dumped to XML; otherwise, <c>false</c>.
+        /// The metadata.
         /// </value>
-        public static bool DumpResponseToXmlFile { get; set; }
+        public static MetaData MetaData { get; set; }
 
         /// <summary>
         /// Gets or sets the last run date.
@@ -191,6 +188,10 @@ namespace Slingshot.Elexio.Utilities
             }
         }
 
+        /// <summary>
+        ///  Gets the metadata specific to the Elexio Church. 
+        /// </summary>
+        /// <returns>The metadata.</returns>
         public static MetaData GetMetaData()
         {
             MetaData metaData = new MetaData();
@@ -207,6 +208,9 @@ namespace Slingshot.Elexio.Utilities
         /// <summary>
         /// Exports the individuals.
         /// </summary>
+        /// <value>
+        /// The file name.
+        /// </value>
         public static void ExportIndividuals( string filename )
         {
             WritePersonAttributes();
@@ -375,6 +379,9 @@ namespace Slingshot.Elexio.Utilities
         /// <summary>
         /// Exports the financial pledges.
         /// </summary>
+        /// <value>
+        /// The filename.
+        /// </value>
         public static void ExportFinancialTransactions( string filename )
         {
             try
@@ -459,7 +466,6 @@ namespace Slingshot.Elexio.Utilities
                 ErrorMessage = ex.Message;
             }
         }
-
 
         /// <summary>
         /// Exports the groups.
@@ -895,6 +901,8 @@ namespace Slingshot.Elexio.Utilities
         }
     }
 
+    #region Helper Classes
+
     public class LoginResponse
     {
         [JsonProperty( "sucess" )]
@@ -1026,4 +1034,6 @@ namespace Slingshot.Elexio.Utilities
                  } );
         }
     }
+
+    #endregion
 }
