@@ -113,10 +113,10 @@ namespace Slingshot.Elexio.Utilities.Translators
             }
 
             string cellPhone = importPerson.phoneCell;
-            if ( homePhone.IsNotNullOrWhitespace() )
+            if ( cellPhone.IsNotNullOrWhitespace() )
             {
                 var phone = new PersonPhone();
-                phone.PhoneType = "Home";
+                phone.PhoneType = "Mobile";
                 phone.PhoneNumber = cellPhone;
                 phone.IsMessagingEnabled = true;
                 phone.PersonId = person.Id;
@@ -125,10 +125,10 @@ namespace Slingshot.Elexio.Utilities.Translators
             }
 
             string workPhone = importPerson.phoneWork;
-            if ( homePhone.IsNotNullOrWhitespace() )
+            if ( workPhone.IsNotNullOrWhitespace() )
             {
                 var phone = new PersonPhone();
-                phone.PhoneType = "Home";
+                phone.PhoneType = "Work";
                 phone.PhoneNumber = workPhone;
                 phone.PersonId = person.Id;
 
