@@ -25,6 +25,18 @@ namespace Slingshot.Elexio.Utilities.Translators
             {
                 pledge.PledgeFrequency = PledgeFrequency.Yearly;
             }
+            else if ( pledgeFreq == "quarterly" )
+            {
+                pledge.PledgeFrequency = PledgeFrequency.Quarterly;
+            }
+            else if ( pledgeFreq == "monthly" )
+            {
+                pledge.PledgeFrequency = PledgeFrequency.Monthly;
+            }
+            else if ( pledgeFreq == "weekly" )
+            {
+                pledge.PledgeFrequency = PledgeFrequency.Weekly;
+            }
             else
             {
                 pledge.PledgeFrequency = PledgeFrequency.OneTime;
