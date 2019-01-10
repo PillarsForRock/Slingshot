@@ -145,6 +145,7 @@ namespace Slingshot.Elexio.Utilities.Translators
                  state.IsNotNullOrWhitespace() && postalcode.IsNotNullOrWhitespace() )
             {
                 var address = new PersonAddress();
+                address.PersonId = person.Id;
                 address.Street1 = street1;
                 address.City = city;
                 address.State = state;
@@ -165,6 +166,7 @@ namespace Slingshot.Elexio.Utilities.Translators
                  state.IsNotNullOrWhitespace() && postalcode.IsNotNullOrWhitespace() )
             {
                 var address = new PersonAddress();
+                address.PersonId = person.Id;
                 address.Street1 = street1;
                 address.City = city;
                 address.State = state;
