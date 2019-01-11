@@ -102,22 +102,22 @@ namespace Slingshot.Elexio.Utilities.Translators
 
             // phone numbers
             string homePhone = importPerson.phoneHome;
-            if ( homePhone.IsNotNullOrWhitespace() )
+            if ( homePhone.AsNumeric().IsNotNullOrWhitespace() )
             {
                 var phone = new PersonPhone();
                 phone.PhoneType = "Home";
-                phone.PhoneNumber = homePhone;
+                phone.PhoneNumber = homePhone.AsNumeric();
                 phone.PersonId = person.Id;
 
                 person.PhoneNumbers.Add( phone );
             }
 
             string cellPhone = importPerson.phoneCell;
-            if ( cellPhone.IsNotNullOrWhitespace() )
+            if ( cellPhone.AsNumeric().IsNotNullOrWhitespace() )
             {
                 var phone = new PersonPhone();
                 phone.PhoneType = "Mobile";
-                phone.PhoneNumber = cellPhone;
+                phone.PhoneNumber = cellPhone.AsNumeric();
                 phone.IsMessagingEnabled = true;
                 phone.PersonId = person.Id;
 
@@ -125,11 +125,11 @@ namespace Slingshot.Elexio.Utilities.Translators
             }
 
             string workPhone = importPerson.phoneWork;
-            if ( workPhone.IsNotNullOrWhitespace() )
+            if ( workPhone.AsNumeric().IsNotNullOrWhitespace() )
             {
                 var phone = new PersonPhone();
                 phone.PhoneType = "Work";
-                phone.PhoneNumber = workPhone;
+                phone.PhoneNumber = workPhone.AsNumeric();
                 phone.PersonId = person.Id;
 
                 person.PhoneNumbers.Add( phone );
