@@ -102,7 +102,7 @@ namespace Slingshot.Elexio.Utilities.Translators
 
             // phone numbers
             string homePhone = importPerson.phoneHome;
-            if ( homePhone.AsNumeric().IsNotNullOrWhitespace() )
+            if ( homePhone != null && homePhone.AsNumeric().IsNotNullOrWhitespace() )
             {
                 var phone = new PersonPhone();
                 phone.PhoneType = "Home";
@@ -113,7 +113,7 @@ namespace Slingshot.Elexio.Utilities.Translators
             }
 
             string cellPhone = importPerson.phoneCell;
-            if ( cellPhone.AsNumeric().IsNotNullOrWhitespace() )
+            if ( cellPhone != null && cellPhone.AsNumeric().IsNotNullOrWhitespace() )
             {
                 var phone = new PersonPhone();
                 phone.PhoneType = "Mobile";
@@ -125,7 +125,7 @@ namespace Slingshot.Elexio.Utilities.Translators
             }
 
             string workPhone = importPerson.phoneWork;
-            if ( workPhone.AsNumeric().IsNotNullOrWhitespace() )
+            if ( workPhone != null && workPhone.AsNumeric().IsNotNullOrWhitespace() )
             {
                 var phone = new PersonPhone();
                 phone.PhoneType = "Work";
