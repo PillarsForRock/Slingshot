@@ -238,6 +238,21 @@ namespace Slingshot.Elexio.Utilities
                             if ( importPerson != null )
                             {
                                 ImportPackage.WriteToPackage( importPerson );
+
+                                string hasPicture = person.hasPicture;
+                                if ( hasPicture.AsBoolean() )
+                                {
+                                    // save person image
+                                    _request = new RestRequest( "upload/" + Hostname + "/profilePictures/" + importPerson.Id + "_orig.jpg", Method.GET );
+
+                                    var image = _client.DownloadData( _request );
+                                    ApiCounter++;
+
+                                    var test = System.Text.Encoding.UTF8.GetString( image );
+
+                                    var path = Path.Combine( ImportPackage.ImageDirectory, "Person_" + importPerson.Id + ".jpg" );
+                                    File.WriteAllBytes( path, image );
+                                }
                             }
                         }
                     }
