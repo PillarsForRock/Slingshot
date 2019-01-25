@@ -132,6 +132,7 @@ namespace Slingshot.Elexio.Utilities
         private const string API_GROUPS = "api/groups/sync";
         private const string API_GROUP_MEMBERS = "api/groups/";
         private const string API_ATTENDANCE = "api/attendance/for_person/";
+        private const string API_INTERACTIONS = "api/interactions/completed";
 
         #endregion
 
@@ -214,6 +215,7 @@ namespace Slingshot.Elexio.Utilities
         public static void ExportIndividuals( string filename )
         {
             WritePersonAttributes();
+            ExportPersonInteractions();
 
             try
             {
@@ -913,6 +915,55 @@ namespace Slingshot.Elexio.Utilities
                 Category = "Elexio Attributes",
                 FieldType = "Rock.Field.Types.DateFieldType"
             } );
+        }
+
+
+        /// <summary>
+        /// Exports the person interactions.
+        /// </summary>
+        public static void ExportPersonInteractions()
+        {
+            // interactions as notes
+            _client = new RestClient( ElexioApi.ApiUrl );
+            _request = new RestRequest( ElexioApi.API_INTERACTIONS, Method.GET );
+            _request.AddQueryParameter( "session_id", ElexioApi.SessionId );
+            _request.AddQueryParameter( "start", "1/1/1990" );
+            _request.AddQueryParameter( "count", "10000" );
+            var response = _client.Execute( _request );
+            ElexioApi.ApiCounter++;
+
+            dynamic interactionData = JsonConvert.DeserializeObject( response.Content );
+
+            var counter = 1000000; // offset to avoid collisions with regular person notes
+            var records = interactionData.data.items;
+            if ( records != null )
+            {
+                foreach ( var interaction in records )
+                {
+                    string personId = interaction.person.uid;
+                    if ( personId.AsIntegerOrNull().HasValue )
+                    {
+                        counter++;
+
+                        PersonNote note = new PersonNote();
+                        note.Id = counter;
+                        note.PersonId = personId.AsInteger();
+                        note.DateTime = interaction.dateCompleted;
+                        note.NoteType = "Legacy Interaction";
+                        note.Caption = interaction.type.name;
+                        note.Text = interaction.summary;
+
+                        string assigned = interaction.assignee.uid;
+
+                        if ( assigned.AsIntegerOrNull().HasValue )
+                        {
+                            note.CreatedByPersonId = assigned.AsInteger();
+                        }
+
+                        ImportPackage.WriteToPackage( note );
+                    }
+                }
+            }
         }
     }
 
