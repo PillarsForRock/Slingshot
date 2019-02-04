@@ -1096,7 +1096,7 @@ namespace Slingshot.Elexio.Utilities
             Map( m => m.CheckNumber ).Name( "Check Number" );
             Map( m => m.Amount ).ConvertUsing( m =>
                  {
-                     return decimal.Parse( Regex.Replace( m.GetField( "Amount" ), @"[^\d.]", "" ) );
+                     return decimal.Parse( Regex.Replace( m.GetField( "Amount" ), @"[^-\d.]", "" ) );
                  } );
         }
     }
