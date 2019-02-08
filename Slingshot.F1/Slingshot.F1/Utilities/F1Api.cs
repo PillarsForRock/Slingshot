@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 using RestSharp;
@@ -556,6 +557,7 @@ namespace Slingshot.F1.Utilities
         public static void ExportContributions( DateTime modifiedSince, bool exportContribImages )
         {
             HashSet<int> transactionIds = new HashSet<int>();
+            List<Task> tasks = new List<Task>();
 
             // if empty, build head of household lookups
             if ( !familyMembers.Any() )
@@ -645,14 +647,24 @@ namespace Slingshot.F1.Utilities
                                             var checkImageId = sourceTransaction.Element( "referenceImage" ).Attribute( "id" )?.Value;
                                             if ( checkImageId.IsNotNullOrWhitespace() )
                                             {
-                                                _request = new RestRequest( API_CONTRIBUTION_RECEIPT_IMAGE + checkImageId, Method.GET );
 
-                                                var image = _client.DownloadData( _request );
-                                                ApiCounter++;
+                                                var task = Task.Run( () =>
+                                                {
+                                                    var client = new RestClient( ApiUrl );
+                                                    client.Authenticator = OAuth1Authenticator.ForProtectedResource( ApiConsumerKey, ApiConsumerSecret, OAuthToken, OAuthSecret );
+                                                    var imageRequest = new RestRequest( API_CONTRIBUTION_RECEIPT_IMAGE + checkImageId, Method.GET );
+                                                    var image = client.DownloadData( imageRequest );
+                                                    ApiCounter++;
 
-                                                var transactionId = sourceTransaction.Attribute( "id" ).Value;
-                                                var path = Path.Combine( ImportPackage.ImageDirectory, "FinancialTransaction_" + transactionId + "_0.jpg" );
-                                                File.WriteAllBytes( path, image );
+                                                    if ( image != null )
+                                                    {
+                                                        var transactionId = sourceTransaction.Attribute( "id" ).Value;
+                                                        var path = Path.Combine( ImportPackage.ImageDirectory, "FinancialTransaction_" + transactionId + "_0.jpg" );
+                                                        File.WriteAllBytes( path, image );
+                                                    }
+                                                } );
+
+                                                tasks.Add( task );
                                             }
                                         }
 
@@ -683,6 +695,9 @@ namespace Slingshot.F1.Utilities
                         transactionLoopCounter++;
                     }
                 }
+
+                // wait till all images are downloaded
+                Task.WaitAll( tasks.ToArray() );
             }
             catch ( Exception ex )
             {
