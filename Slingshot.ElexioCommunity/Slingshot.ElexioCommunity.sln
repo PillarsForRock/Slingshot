@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slingshot.Elexio", "Slingshot.Elexio\Slingshot.Elexio.csproj", "{40951EB6-D861-4C3B-89E0-A2C59E57A35C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slingshot.ElexioCommunity", "Slingshot.ElexioCommunity\Slingshot.ElexioCommunity.csproj", "{40951EB6-D861-4C3B-89E0-A2C59E57A35C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slingshot.Core", "..\Slingshot.Core\Slingshot.Core\Slingshot.Core.csproj", "{B6072804-DC94-473F-A7E9-E175DB03CAD4}"
 EndProject

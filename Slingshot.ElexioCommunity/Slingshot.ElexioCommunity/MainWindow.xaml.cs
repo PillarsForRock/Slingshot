@@ -15,12 +15,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using Slingshot.Elexio.Utilities;
+using Slingshot.ElexioCommunity.Utilities;
 using Slingshot.Core;
 using Slingshot.Core.Model;
 using Slingshot.Core.Utilities;
 
-namespace Slingshot.Elexio
+namespace Slingshot.ElexioCommunity
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -65,19 +65,19 @@ namespace Slingshot.Elexio
             var exportSettings = (ExportSettings)e.Argument;
 
             // clear filesystem directories
-            ElexioApi.InitializeExport();
+            ElexioCommunityApi.InitializeExport();
 
             // export individuals
             if ( exportSettings.ExportIndividuals )
             {
                 exportWorker.ReportProgress( 1, "Exporting Individuals..." );
-                ElexioApi.ExportIndividuals( exportSettings.PersonCSVFileName );
+                ElexioCommunityApi.ExportIndividuals( exportSettings.PersonCSVFileName );
 
-                if ( ElexioApi.ErrorMessage.IsNotNullOrWhitespace() )
+                if ( ElexioCommunityApi.ErrorMessage.IsNotNullOrWhitespace() )
                 {
                     this.Dispatcher.Invoke( () =>
                     {
-                        exportWorker.ReportProgress( 4, $"Error exporting individuals: {ElexioApi.ErrorMessage}" );
+                        exportWorker.ReportProgress( 4, $"Error exporting individuals: {ElexioCommunityApi.ErrorMessage}" );
                     } );
                 }
             }
@@ -87,26 +87,26 @@ namespace Slingshot.Elexio
             {
                 exportWorker.ReportProgress( 25, "Exporting Financial Accounts..." );
 
-                ElexioApi.ExportFinancialAccounts();
-                if ( ElexioApi.ErrorMessage.IsNotNullOrWhitespace() )
+                ElexioCommunityApi.ExportFinancialAccounts();
+                if ( ElexioCommunityApi.ErrorMessage.IsNotNullOrWhitespace() )
                 {
-                    exportWorker.ReportProgress( 28, $"Error exporting financial accounts: {ElexioApi.ErrorMessage}" );
+                    exportWorker.ReportProgress( 28, $"Error exporting financial accounts: {ElexioCommunityApi.ErrorMessage}" );
                 }
 
                 exportWorker.ReportProgress( 30, "Exporting Financial Pledges..." );
 
-                ElexioApi.ExportFinancialPledges();
-                if ( ElexioApi.ErrorMessage.IsNotNullOrWhitespace() )
+                ElexioCommunityApi.ExportFinancialPledges();
+                if ( ElexioCommunityApi.ErrorMessage.IsNotNullOrWhitespace() )
                 {
-                    exportWorker.ReportProgress( 33, $"Error exporting financial pledges: {ElexioApi.ErrorMessage}" );
+                    exportWorker.ReportProgress( 33, $"Error exporting financial pledges: {ElexioCommunityApi.ErrorMessage}" );
                 }
 
                 exportWorker.ReportProgress( 35, "Exporting Contribution Information..." );
 
-                ElexioApi.ExportFinancialTransactions( exportSettings.GivingCSVFileName );
-                if ( ElexioApi.ErrorMessage.IsNotNullOrWhitespace() )
+                ElexioCommunityApi.ExportFinancialTransactions( exportSettings.GivingCSVFileName );
+                if ( ElexioCommunityApi.ErrorMessage.IsNotNullOrWhitespace() )
                 {
-                    exportWorker.ReportProgress( 38, $"Error exporting financial data: {ElexioApi.ErrorMessage}" );
+                    exportWorker.ReportProgress( 38, $"Error exporting financial data: {ElexioCommunityApi.ErrorMessage}" );
                 }
             }
 
@@ -115,11 +115,11 @@ namespace Slingshot.Elexio
             {
                 exportWorker.ReportProgress( 50, $"Exporting Groups..." );
 
-                ElexioApi.ExportGroups();
+                ElexioCommunityApi.ExportGroups();
 
-                if ( ElexioApi.ErrorMessage.IsNotNullOrWhitespace() )
+                if ( ElexioCommunityApi.ErrorMessage.IsNotNullOrWhitespace() )
                 {
-                    exportWorker.ReportProgress( 53, $"Error exporting groups: {ElexioApi.ErrorMessage}" );
+                    exportWorker.ReportProgress( 53, $"Error exporting groups: {ElexioCommunityApi.ErrorMessage}" );
                 }
             }
 
@@ -128,11 +128,11 @@ namespace Slingshot.Elexio
             {
                 exportWorker.ReportProgress( 75, $"Exporting Attendance..." );
 
-                ElexioApi.ExportAttendance();
+                ElexioCommunityApi.ExportAttendance();
 
-                if ( ElexioApi.ErrorMessage.IsNotNullOrWhitespace() )
+                if ( ElexioCommunityApi.ErrorMessage.IsNotNullOrWhitespace() )
                 {
-                    exportWorker.ReportProgress( 78, $"Error exporting attendance: {ElexioApi.ErrorMessage}" );
+                    exportWorker.ReportProgress( 78, $"Error exporting attendance: {ElexioCommunityApi.ErrorMessage}" );
                 }
             }
 
@@ -152,7 +152,7 @@ namespace Slingshot.Elexio
         private void _apiUpdateTimer_Tick( object sender, EventArgs e )
         {
             // update the api stats
-            lblApiUsage.Text = $"API Usage: {ElexioApi.ApiCounter}";
+            lblApiUsage.Text = $"API Usage: {ElexioCommunityApi.ApiCounter}";
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace Slingshot.Elexio
         /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private void Window_Loaded( object sender, RoutedEventArgs e )
         {
-            lblApiUsage.Text = $"API Usage: {ElexioApi.ApiCounter}";
+            lblApiUsage.Text = $"API Usage: {ElexioCommunityApi.ApiCounter}";
         }
 
         /// <summary>

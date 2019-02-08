@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Slingshot.Elexio.Properties {
+namespace Slingshot.ElexioCommunity.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

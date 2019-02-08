@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Xml;
-using System.Xml.Linq;
 
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -20,14 +16,14 @@ using RestSharp;
 using Slingshot.Core;
 using Slingshot.Core.Model;
 using Slingshot.Core.Utilities;
-using Slingshot.Elexio.Utilities.Translators;
+using Slingshot.ElexioCommunity.Utilities.Translators;
 
-namespace Slingshot.Elexio.Utilities
+namespace Slingshot.ElexioCommunity.Utilities
 {
     /// <summary>
     /// Elexio API
     /// </summary>
-    public static class ElexioApi
+    public static class ElexioCommunityApi
     {
         private static RestClient _client;
         private static RestRequest _request;
@@ -234,7 +230,7 @@ namespace Slingshot.Elexio.Utilities
                     {
                         foreach ( var person in letterGroup.Value )
                         {
-                            Person importPerson = ElexioPerson.Translate( person );
+                            Person importPerson = ElexioCommunityPerson.Translate( person );
                             _uids.Add( importPerson.Id );
 
                             if ( importPerson != null )
@@ -326,7 +322,7 @@ namespace Slingshot.Elexio.Utilities
                 {
                     foreach ( var account in records )
                     {
-                        FinancialAccount importAccount = ElexioFinancialAccount.Translate( account );
+                        FinancialAccount importAccount = ElexioCommunityFinancialAccount.Translate( account );
                         if ( importAccount != null )
                         {
                             ImportPackage.WriteToPackage( importAccount );
@@ -377,7 +373,7 @@ namespace Slingshot.Elexio.Utilities
                         {
                             foreach ( var personPledge in personPledgeRecords )
                             {
-                                FinancialPledge importPledge = ElexioFinancialPledge.Translate( personPledge );
+                                FinancialPledge importPledge = ElexioCommunityFinancialPledge.Translate( personPledge );
                                 if ( importPledge != null )
                                 {
                                     ImportPackage.WriteToPackage( importPledge );
@@ -511,7 +507,7 @@ namespace Slingshot.Elexio.Utilities
                 {
                     foreach ( var group in records )
                     {
-                        Slingshot.Core.Model.Group importGroup = ElexioGroup.Translate( group );
+                        Slingshot.Core.Model.Group importGroup = ElexioCommunityGroup.Translate( group );
                         if ( importGroup != null )
                         {
                             ImportPackage.WriteToPackage( importGroup );
@@ -532,7 +528,7 @@ namespace Slingshot.Elexio.Utilities
                             {
                                 foreach ( var groupMember in letterGroup.Value )
                                 {
-                                    GroupMember importGroupMember = ElexioGroupMember.Translate( groupMember, importGroup.Id );
+                                    GroupMember importGroupMember = ElexioCommunityGroupMember.Translate( groupMember, importGroup.Id );
                                     if ( importGroupMember != null )
                                     {
                                         ImportPackage.WriteToPackage( importGroupMember );
@@ -573,7 +569,7 @@ namespace Slingshot.Elexio.Utilities
                     {
                         foreach ( var attendance in records )
                         {
-                            Attendance importAttendance = ElexioAttendance.Translate( attendance );
+                            Attendance importAttendance = ElexioCommunityAttendance.Translate( attendance );
 
                             if ( importAttendance != null )
                             {
@@ -924,13 +920,13 @@ namespace Slingshot.Elexio.Utilities
         public static void ExportPersonInteractions()
         {
             // interactions as notes
-            _client = new RestClient( ElexioApi.ApiUrl );
-            _request = new RestRequest( ElexioApi.API_INTERACTIONS, Method.GET );
-            _request.AddQueryParameter( "session_id", ElexioApi.SessionId );
+            _client = new RestClient( ElexioCommunityApi.ApiUrl );
+            _request = new RestRequest( ElexioCommunityApi.API_INTERACTIONS, Method.GET );
+            _request.AddQueryParameter( "session_id", ElexioCommunityApi.SessionId );
             _request.AddQueryParameter( "start", "1/1/1990" );
             _request.AddQueryParameter( "count", "10000" );
             var response = _client.Execute( _request );
-            ElexioApi.ApiCounter++;
+            ElexioCommunityApi.ApiCounter++;
 
             dynamic interactionData = JsonConvert.DeserializeObject( response.Content );
 

@@ -12,9 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-using Slingshot.Elexio.Utilities;
+using Slingshot.ElexioCommunity.Utilities;
 
-namespace Slingshot.Elexio
+namespace Slingshot.ElexioCommunity
 {
     /// <summary>
     /// Interaction logic for Login.xaml
@@ -32,9 +32,9 @@ namespace Slingshot.Elexio
 
             if ( txtHostname.Text != string.Empty && txtApiPassword.Text != string.Empty && txtApiUsername.Text != string.Empty )
             {
-                ElexioApi.Connect( txtHostname.Text, txtApiUsername.Text, txtApiPassword.Text );
+                ElexioCommunityApi.Connect( txtHostname.Text, txtApiUsername.Text, txtApiPassword.Text );
 
-                if ( ElexioApi.IsConnected )
+                if ( ElexioCommunityApi.IsConnected )
                 {
                     MainWindow mainWindow = new MainWindow();
                     mainWindow.Show();
@@ -42,7 +42,7 @@ namespace Slingshot.Elexio
                 }
                 else
                 {
-                    lblMessage.Text = $"Could not login with the information provided. {ElexioApi.ErrorMessage}";
+                    lblMessage.Text = $"Could not login with the information provided. {ElexioCommunityApi.ErrorMessage}";
                 }
             }
             else

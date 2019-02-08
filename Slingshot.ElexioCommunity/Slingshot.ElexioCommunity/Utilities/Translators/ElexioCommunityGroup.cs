@@ -8,9 +8,9 @@ using Slingshot.Core;
 using Slingshot.Core.Model;
 using Group = Slingshot.Core.Model.Group;
 
-namespace Slingshot.Elexio.Utilities.Translators
+namespace Slingshot.ElexioCommunity.Utilities.Translators
 {
-    public static class ElexioGroup
+    public static class ElexioCommunityGroup
     {
         public static Group Translate( dynamic importGroup )
         {

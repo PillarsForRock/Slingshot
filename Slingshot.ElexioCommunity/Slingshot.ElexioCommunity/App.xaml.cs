@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Slingshot.Elexio
+namespace Slingshot.ElexioCommunity
 {
     /// <summary>
     /// Interaction logic for App.xaml

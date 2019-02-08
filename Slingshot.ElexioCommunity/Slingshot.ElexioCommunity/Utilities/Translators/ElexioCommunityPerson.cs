@@ -10,9 +10,9 @@ using Slingshot.Core;
 using Slingshot.Core.Model;
 using Slingshot.Core.Utilities;
 
-namespace Slingshot.Elexio.Utilities.Translators
+namespace Slingshot.ElexioCommunity.Utilities.Translators
 {
-    public static class ElexioPerson
+    public static class ElexioCommunityPerson
     {
         public static Person Translate( dynamic importPerson )
         {
@@ -56,11 +56,11 @@ namespace Slingshot.Elexio.Utilities.Translators
             person.ConnectionStatus = "Unknown";
 
             // family
-            var _client = new RestClient( ElexioApi.ApiUrl );
-            var _request = new RestRequest( ElexioApi.API_INDIVIDUAL + person.Id.ToString(), Method.GET );
-            _request.AddQueryParameter( "session_id", ElexioApi.SessionId );
+            var _client = new RestClient( ElexioCommunityApi.ApiUrl );
+            var _request = new RestRequest( ElexioCommunityApi.API_INDIVIDUAL + person.Id.ToString(), Method.GET );
+            _request.AddQueryParameter( "session_id", ElexioCommunityApi.SessionId );
             var response = _client.Execute( _request );
-            ElexioApi.ApiCounter++;
+            ElexioCommunityApi.ApiCounter++;
 
             dynamic data = JsonConvert.DeserializeObject( response.Content );
 
@@ -246,7 +246,7 @@ namespace Slingshot.Elexio.Utilities.Translators
             #region Attributes
 
             //// attributes
-            MetaData metaData = ElexioApi.MetaData;
+            MetaData metaData = ElexioCommunityApi.MetaData;
 
             //// dates 1 - 10
             // date 1

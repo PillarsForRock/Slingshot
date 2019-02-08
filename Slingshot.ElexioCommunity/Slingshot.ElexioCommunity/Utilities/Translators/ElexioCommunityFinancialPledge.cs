@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Slingshot.Core.Model;
 
-namespace Slingshot.Elexio.Utilities.Translators
+namespace Slingshot.ElexioCommunity.Utilities.Translators
 {
-    public static class ElexioFinancialPledge
+    public static class ElexioCommunityFinancialPledge
     {
         public static FinancialPledge Translate( dynamic importFinancialPledge )
         {
