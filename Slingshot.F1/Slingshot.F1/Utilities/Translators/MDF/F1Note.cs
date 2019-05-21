@@ -19,6 +19,13 @@ namespace Slingshot.F1.Utilities.Translators.MDB
         {
             try
             {
+                // If the note is archived, we do not want to import it
+                var isArchive = row.Field<Int16>( "NoteArchived" );
+                if (isArchive != 0 )
+                {
+                    return null;
+                }
+
                 var individualId = row.Field<int?>( "Individual_ID" );
                 var householdId = row.Field<int?>( "Household_ID" );
 
@@ -58,7 +65,7 @@ namespace Slingshot.F1.Utilities.Translators.MDB
 
                 return note;
             }
-            catch
+            catch (Exception ex)
             {
                 return null;
             }

@@ -52,7 +52,7 @@ namespace Slingshot.F1.Utilities.Translators.MDB
                 }
             }
 
-            account.IsTaxDeductible = row.Field<int>( "taxDeductible" ) != 0;
+            account.IsTaxDeductible = true;
 
             return account;
         }

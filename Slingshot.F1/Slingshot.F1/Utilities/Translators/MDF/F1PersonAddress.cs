@@ -49,7 +49,7 @@ namespace Slingshot.F1.Utilities.Translators.MDB
                 address.Street2 = row.Field<string>( "address_2" );
                 address.City = row.Field<string>( "city" );
                 address.State = row.Field<string>( "state" );
-                address.PostalCode = row.Field<string>( "zip_code" );
+                address.PostalCode = row.Field<string>("Postal_Code");
                 address.Country = row.Field<string>( "country" );
 
                 var addressType = row.Field<string>( "address_type" );

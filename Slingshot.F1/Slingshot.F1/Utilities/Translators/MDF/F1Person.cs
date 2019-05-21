@@ -7,6 +7,8 @@ using System.Linq;
 
 using Slingshot.Core;
 using Slingshot.Core.Model;
+using System.Globalization;
+using System.Threading;
 
 namespace Slingshot.F1.Utilities.Translators.MDB
 {
@@ -58,16 +60,19 @@ namespace Slingshot.F1.Utilities.Translators.MDB
                     person.LastName = lastName;
                 }
 
+                CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+                TextInfo textInfo = cultureInfo.TextInfo;
+
                 string salutation = row.Field<string>( "prefix" );
                 if ( salutation.IsNotNullOrWhitespace() )
                 {
-                    person.Salutation = salutation;
+                    person.Salutation = textInfo.ToTitleCase( salutation.ToLower() );
                 }
 
                 string suffix = row.Field<string>( "suffix" );
                 if ( suffix.IsNotNullOrWhitespace() )
                 {
-                    person.Suffix = suffix;
+                    person.Suffix = textInfo.ToTitleCase( suffix.ToLower() );
                 }
 
                 string email = null;
@@ -178,18 +183,18 @@ namespace Slingshot.F1.Utilities.Translators.MDB
                         person.FamilyRole = FamilyRole.Child;
 
                         // generate a new unique family id
-                        if ( person.FirstName.IsNotNullOrWhitespace() || person.LastName.IsNotNullOrWhitespace() ||
-                             person.MiddleName.IsNotNullOrWhitespace() || person.NickName.IsNotNullOrWhitespace() )
+                        if (person.FirstName.IsNotNullOrWhitespace() || person.LastName.IsNotNullOrWhitespace() ||
+                             person.MiddleName.IsNotNullOrWhitespace() || person.NickName.IsNotNullOrWhitespace())
                         {
                             MD5 md5Hasher = MD5.Create();
-                            var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( person.FirstName + person.NickName + person.MiddleName + person.LastName ) );
-                            var familyId = Math.Abs( BitConverter.ToInt32( hashed, 0 ) ); // used abs to ensure positive number
-                            if ( familyId > 0 )
+                            var hashed = md5Hasher.ComputeHash(Encoding.UTF8.GetBytes(person.FirstName + person.NickName + person.MiddleName + person.LastName));
+                            var familyId = Math.Abs(BitConverter.ToInt32(hashed, 0)); // used abs to ensure positive number
+                            if (familyId > 0)
                             {
                                 person.FamilyId = familyId;
                             }
                         }
-                        notes.Add( "F1 Visitor of the " + person.FamilyName + "(" + person.FamilyId + ")" );
+                        notes.Add("F1 Visitor of the " + person.FamilyName + "(" + houseHouldId + ")");
                         break;
                     default:
                         person.FamilyRole = FamilyRole.Child;
@@ -246,7 +251,7 @@ namespace Slingshot.F1.Utilities.Translators.MDB
 
 
                     // Add the attribute value for date (if not empty) 
-                    DateTime? requirementDate = requirement.Field<DateTime?>( "requirement_date" );
+                    DateTime? requirementDate = requirement.Field<string>( "requirement_date" ).AsDateTime();
                     var requirementDateKey = requirementName.RemoveSpaces().RemoveSpecialCharacters() + "Date";
 
                     if ( requirementDate.HasValue )
@@ -263,7 +268,7 @@ namespace Slingshot.F1.Utilities.Translators.MDB
                 // person fields
 
                 // occupation
-                string occupation = row.Field<string>( "Occupation" );
+                string occupation = row.Field<string>( "Occupation_Name" );
                 if ( occupation.IsNotNullOrWhitespace() )
                 {
                     person.Attributes.Add( new PersonAttributeValue
@@ -299,7 +304,7 @@ namespace Slingshot.F1.Utilities.Translators.MDB
                 }
 
                 // denomination
-                string denomination = row.Field<string>( "FormerDenomination" );
+                string denomination = row.Field<string>("FormerDenomination_Name");
                 if ( denomination.IsNotNullOrWhitespace() )
                 {
                     person.Attributes.Add( new PersonAttributeValue

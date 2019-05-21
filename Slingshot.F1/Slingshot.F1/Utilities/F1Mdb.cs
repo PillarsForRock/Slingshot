@@ -401,7 +401,7 @@ SELECT DISTINCT
 	AA.Individual_ID
 	,AA.RLC_ID AS Group_Id
 	,'Member' AS Group_Member_Type
-	, AA.BreakoutGroup
+	, AA.BreakoutGroupName
 	, null as ParentGroupId 
 
 FROM ActivityAssignment AA
@@ -414,10 +414,10 @@ SELECT Distinct
 	 Individual_ID
 	, null as Group_Id
 	, 'Member' as Group_Member_Type
-	,  BreakoutGroup
+	,  BreakoutGroupName
 	, IIF(isnull(RLC_ID),Activity_ID,RLC_ID) as ParentGroupId
 FROM [ActivityAssignment]
-Where [BreakoutGroup] is not null
+Where [BreakoutGroupName] is not null
 Order By Group_Id, Individual_ID";
             }
         }
@@ -523,7 +523,7 @@ SELECT DISTINCT
 	, Is_Active
 	, null as start_date
 	, -1 as is_public
-	, RoomName as Location_Name
+	, Room_Name as Location_Name
 	,'' as [ScheduleDay]
     ,null as [StartHour]
     ,'' as [Address1]
@@ -538,7 +538,7 @@ FROM RLC
 UNION ALL
 
 SELECT Distinct
-	[BreakoutGroup] as [Name]
+	[BreakoutGroupName] as [Name]
 	, null as Group_Id
 	, 99999904 as GroupTypeId
 	,null as description
@@ -556,7 +556,7 @@ SELECT Distinct
     ,'' as [Country]
 	, IIF(isnull(RLC_ID),Activity_ID,RLC_ID) as ParentGroupId
 FROM [ActivityAssignment]
-Where [BreakoutGroup] is not null";
+Where [BreakoutGroupName] is not null";
             }
         }
 
@@ -567,7 +567,6 @@ Where [BreakoutGroup] is not null";
                 return $@"
 SELECT Distinct
 	fund_name
-	, taxDeductible
 	, null as sub_fund_name
 FROM Contribution
 
@@ -575,7 +574,6 @@ UNION ALL
 
 SELECT Distinct
 	fund_name
-	, taxDeductible
 	, sub_fund_name
 From Contribution
 where sub_fund_name is not null";
@@ -666,8 +664,8 @@ SELECT [Individual_ID]
       ,AttendanceDate as StartDateTime
       ,null as EndDateTime
       ,[Comments] as [Note]
-  FROM [Groups_Attendance]
-where IsPresent <> 0
+  FROM [GroupsAttendance]
+where Met <> 0
 and AttendanceDate is not null";
             }
         }
@@ -988,7 +986,7 @@ and AttendanceDate is not null";
                 foreach ( var member in dtActivityMembers.Select( "Group_Id is null" ) )
                 {
                     MD5 md5Hasher = MD5.Create();
-                    var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( member.Field<string>( "BreakoutGroup" ) + member.Field<string>( "ParentGroupId" ) ) );
+                    var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( member.Field<string>( "BreakoutGroupName" ) + member.Field<string>( "ParentGroupId" ) ) );
                     var groupId = Math.Abs( BitConverter.ToInt32( hashed, 0 ) ); // used abs to ensure positive number
                     if ( groupId > 0 )
                     {

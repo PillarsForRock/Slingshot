@@ -42,7 +42,7 @@ namespace Slingshot.F1.Utilities.Translators.MDB
             group.Name = row.Field<string>( "Group_Name" ).Left( 50 );
             group.GroupTypeId = row.Field<int>( "Group_Type_ID" );
             group.IsActive = row.Field<int>( "is_active" ) != 0;
-            group.IsPublic = row.Field<int>( "is_public" ) != 0;
+            group.IsPublic = true;
             group.MeetingDay = row.Field<string>( "ScheduleDay" );
             group.ParentGroupId = row.Field<int?>( "ParentGroupId" ) ?? 90000000 + group.GroupTypeId;
             group.Description = row.Field<string>( "Description" );

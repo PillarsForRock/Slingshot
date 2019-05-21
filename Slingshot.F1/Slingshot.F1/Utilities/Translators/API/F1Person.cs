@@ -258,21 +258,21 @@ namespace Slingshot.F1.Utilities.Translators.API
                 }
                 else
                 {
-                    // likely the person is a visitor and should belong to their own family
+                    //// likely the person is a visitor and should belong to their own family
                     person.FamilyRole = FamilyRole.Child;
 
-                    // generate a new unique family id
-                    if ( person.FirstName.IsNotNullOrWhitespace() || person.LastName.IsNotNullOrWhitespace() ||
-                         person.MiddleName.IsNotNullOrWhitespace() || person.NickName.IsNotNullOrWhitespace() )
-                    {
-                        MD5 md5Hasher = MD5.Create();
-                        var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( person.FirstName + person.NickName + person.MiddleName + person.LastName ) );
-                        var familyId = Math.Abs( BitConverter.ToInt32( hashed, 0 ) ); // used abs to ensure positive number
-                        if ( familyId > 0 )
-                        {
-                            person.FamilyId = familyId;
-                        }
-                    }
+                    //// generate a new unique family id
+                    //if ( person.FirstName.IsNotNullOrWhitespace() || person.LastName.IsNotNullOrWhitespace() ||
+                    //     person.MiddleName.IsNotNullOrWhitespace() || person.NickName.IsNotNullOrWhitespace() )
+                    //{
+                    //    MD5 md5Hasher = MD5.Create();
+                    //    var hashed = md5Hasher.ComputeHash( Encoding.UTF8.GetBytes( person.FirstName + person.NickName + person.MiddleName + person.LastName ) );
+                    //    var familyId = Math.Abs( BitConverter.ToInt32( hashed, 0 ) ); // used abs to ensure positive number
+                    //    if ( familyId > 0 )
+                    //    {
+                    //        person.FamilyId = familyId;
+                    //    }
+                    //}
                 }
 
                 // campus
