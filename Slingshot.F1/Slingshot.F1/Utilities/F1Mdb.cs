@@ -234,8 +234,10 @@ individual_id
 , communication_type
 , communication_value
 , listed
+, LastUpdatedDate
 FROM Communication
 Where individual_id is not null
+ORDER BY Individual_ID, LastUpdatedDate DESC
 ";
             }
         }
